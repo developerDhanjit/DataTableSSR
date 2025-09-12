@@ -1,10 +1,18 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { PrimeReactProvider } from "primereact/api";
+import App from "./App.tsx";
 
-createRoot(document.getElementById('root')!).render(
+// PrimeReact CSS
+import "primereact/resources/themes/md-dark-deeppurple/theme.css"; //theme
+import "primereact/resources/primereact.min.css"; //core css
+
+import "./App.css";
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    <PrimeReactProvider value={{ appendTo: "self" }}>
+      <App />
+    </PrimeReactProvider>
+  </StrictMode>
+);
