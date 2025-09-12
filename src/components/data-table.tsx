@@ -7,6 +7,7 @@ export const DTable = () => {
   const [selectedData, setSelectedData] = useState();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState();
+  const [first, setFirst] = useState(0);
 
   const getApiData = async (pageNumber: number = 1) => {
     setLoading(true);
@@ -31,7 +32,9 @@ export const DTable = () => {
   }, []);
 
   const loadData = async (event) => {
-    getApiData(event.page + 1);
+    setFirst(event.first);
+    const pageNumber = event.first / event.rows + 1;
+    getApiData(pageNumber);
   };
 
   return (
@@ -40,23 +43,22 @@ export const DTable = () => {
         className="tailwind"
         value={apiData?.data}
         paginator
+        first={first}
         lazy
         onPage={loadData}
         loading={loading}
         rows={12}
         totalRecords={apiData?.pagination?.total}
         tableStyle={{ minWidth: "50rem" }}
-        selectionMode={"checkbox"}
         selection={selectedData}
         onSelectionChange={(e) => setSelectedData(e.value)}
-        dataKey="id"
       >
         <Column
           selectionMode="multiple"
           headerStyle={{ width: "3rem" }}
         ></Column>
         <Column field="title" header="Title"></Column>
-        <Column field="place_of_origin" header="Place of  origin"></Column>
+        <Column field="place_of_origin" header="Place of origin"></Column>
         <Column field="artist_display" header="Artist display"></Column>
         <Column field="inscriptions" header="Inscriptions"></Column>
         <Column field="date_start" header="Date Start"></Column>
