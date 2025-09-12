@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 export const DTable = () => {
   const [apiData, setApiData] = useState();
+  const [selectedData, setSelectedData] = useState();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState();
 
@@ -45,7 +46,15 @@ export const DTable = () => {
         rows={12}
         totalRecords={apiData?.pagination?.total}
         tableStyle={{ minWidth: "50rem" }}
+        selectionMode={"checkbox"}
+        selection={selectedData}
+        onSelectionChange={(e) => setSelectedData(e.value)}
+        dataKey="id"
       >
+        <Column
+          selectionMode="multiple"
+          headerStyle={{ width: "3rem" }}
+        ></Column>
         <Column field="title" header="Title"></Column>
         <Column field="place_of_origin" header="Place of  origin"></Column>
         <Column field="artist_display" header="Artist display"></Column>
