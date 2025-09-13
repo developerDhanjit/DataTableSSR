@@ -9,6 +9,7 @@ export const DTable = () => {
     pagination: {
       total: number;
       limit: number;
+      current_page: number;
     };
     data: {
       id: string;
@@ -37,8 +38,6 @@ export const DTable = () => {
   const [first, setFirst] = useState<number>(0);
   const op = useRef<OverlayPanel>(null);
 
-  const [pendingSelections, setPendingSelections] = useState<number>(0);
-
   const getApiData = async (pageNumber: number = 1) => {
     setLoading(true);
     try {
@@ -57,48 +56,35 @@ export const DTable = () => {
     }
   };
 
+  // initial api data
   useEffect(() => {
     getApiData(1);
   }, []);
 
-  useEffect(() => {
-    if (pendingSelections > 0 && apiData?.data?.length) {
-      const count = Math.min(pendingSelections, 12);
-      const selected = apiData.data.slice(0, count);
-      setSelectedData((prev) => [...prev, ...selected]);
-      setPendingSelections((prev) => prev - count);
-    }
-  }, [apiData]);
-
-  useEffect(() => {
-    console.log("Pending Selections:", pendingSelections);
-  }, [pendingSelections]);
-
+  // load data for each page
   const loadData = async (event: { first: number; rows: number }) => {
     setFirst(event.first);
     const pageNumber = event.first / event.rows + 1;
     getApiData(pageNumber);
   };
 
+  // select rows
   const selectRows = (count: number) => {
     if (count > 12) {
-      setPendingSelections(count - 12);
+      alert("Please chose a number below 12 per page");
+      return;
     }
-    if (apiData?.data) {
-      const selected = apiData.data.slice(0, count);
-      setSelectedData((prev) => [...prev, ...selected]);
-
-      if (count > 12) {
-        setPendingSelections(count - 12);
-      } else {
-        setPendingSelections(0);
-      }
-
+    if (!apiData) return;
+    if (apiData) {
+      const rowsToSelect = apiData.data.slice(0, count);
+      setSelectedData((prev) => [...prev, ...rowsToSelect]);
       op.current?.hide();
     }
   };
+
   return (
     <div className="card">
+      {/* {JSON.stringify(selectedData)} */}
       <DataTable
         value={apiData?.data || []}
         paginator
