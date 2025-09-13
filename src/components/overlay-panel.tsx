@@ -19,7 +19,7 @@ export default function SelectRows({ onSubmit }: SelectRowsProps) {
       />
       <Button
         label="submit"
-        onClick={(e) => {
+        onClick={() => {
           if (value > 0) {
             onSubmit(value);
           }

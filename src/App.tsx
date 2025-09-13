@@ -4,7 +4,7 @@ function App() {
   return (
     <>
       <h1>Datatable - SSR + PrimeReact </h1>
-      <h3>Assinment for : GrowMeOrganic </h3>
+      <h3>Assignment for : GrowMeOrganic </h3>
       <DTable />
       <Footer />
     </>
