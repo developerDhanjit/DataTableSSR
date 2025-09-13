@@ -7,6 +7,9 @@ import App from "./App.tsx";
 import "primereact/resources/themes/md-dark-deeppurple/theme.css"; //theme
 import "primereact/resources/primereact.min.css"; //core css
 
+// Prime icons
+import "primeicons/primeicons.css";
+
 import "./App.css";
 
 createRoot(document.getElementById("root")!).render(

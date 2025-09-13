@@ -1,13 +1,43 @@
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { OverlayPanel } from "primereact/overlaypanel";
+import SelectRows from "./overlay-panel";
 
 export const DTable = () => {
-  const [apiData, setApiData] = useState();
-  const [selectedData, setSelectedData] = useState();
+  interface ApiItem {
+    pagination: {
+      total: number;
+      limit: number;
+    };
+    data: {
+      id: string;
+      title: string;
+      place_of_origin: string;
+      artist_display: string;
+      inscriptions: string;
+      date_start: string;
+      date_end: string;
+    }[];
+  }
+
+  type Artwork = {
+    id: string;
+    title: string;
+    place_of_origin: string;
+    artist_display: string;
+    inscriptions: string;
+    date_start: string;
+    date_end: string;
+  };
+
+  const [apiData, setApiData] = useState<ApiItem>();
+  const [selectedData, setSelectedData] = useState<Artwork>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState();
-  const [first, setFirst] = useState(0);
+  const [first, setFirst] = useState<number>(0);
+  const op = useRef<OverlayPanel>(null);
+
+  const [showOverlay, setShowOverlay] = useState<boolean>(false);
 
   const getApiData = async (pageNumber: number = 1) => {
     setLoading(true);
@@ -21,7 +51,7 @@ export const DTable = () => {
         setApiData(data);
       }
     } catch (error) {
-      setError(error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -31,7 +61,7 @@ export const DTable = () => {
     getApiData(1);
   }, []);
 
-  const loadData = async (event) => {
+  const loadData = async (event: { first: number; rows: number }) => {
     setFirst(event.first);
     const pageNumber = event.first / event.rows + 1;
     getApiData(pageNumber);
@@ -40,8 +70,7 @@ export const DTable = () => {
   return (
     <div className="card">
       <DataTable
-        className="tailwind"
-        value={apiData?.data}
+        value={apiData?.data || []}
         paginator
         first={first}
         lazy
@@ -49,15 +78,43 @@ export const DTable = () => {
         loading={loading}
         rows={12}
         totalRecords={apiData?.pagination?.total}
-        tableStyle={{ minWidth: "50rem" }}
+        tableStyle={{ minWidth: "20rem" }}
         selection={selectedData}
+        dataKey="id"
         onSelectionChange={(e) => setSelectedData(e.value)}
       >
         <Column
           selectionMode="multiple"
           headerStyle={{ width: "3rem" }}
         ></Column>
-        <Column field="title" header="Title"></Column>
+
+        <Column
+          field="title"
+          header={
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "1rem",
+              }}
+            >
+              <span>Title</span>
+              <span style={{ cursor: "pointer" }}>
+                <i
+                  className="pi pi-chevron-down"
+                  onClick={(e) => op.current?.toggle(e)}
+                ></i>
+              </span>
+              <span>
+                <OverlayPanel ref={op}>
+                  <SelectRows />
+                </OverlayPanel>
+              </span>
+            </div>
+          }
+        />
+
         <Column field="place_of_origin" header="Place of origin"></Column>
         <Column field="artist_display" header="Artist display"></Column>
         <Column field="inscriptions" header="Inscriptions"></Column>
