@@ -37,6 +37,8 @@ export const DTable = () => {
   const [first, setFirst] = useState<number>(0);
   const op = useRef<OverlayPanel>(null);
 
+  const [pendingSelections, setPendingSelections] = useState<number>(0);
+
   const getApiData = async (pageNumber: number = 1) => {
     setLoading(true);
     try {
@@ -59,12 +61,42 @@ export const DTable = () => {
     getApiData(1);
   }, []);
 
+  useEffect(() => {
+    if (pendingSelections > 0 && apiData?.data?.length) {
+      const count = Math.min(pendingSelections, 12);
+      const selected = apiData.data.slice(0, count);
+      setSelectedData((prev) => [...prev, ...selected]);
+      setPendingSelections((prev) => prev - count);
+    }
+  }, [apiData]);
+
+  useEffect(() => {
+    console.log("Pending Selections:", pendingSelections);
+  }, [pendingSelections]);
+
   const loadData = async (event: { first: number; rows: number }) => {
     setFirst(event.first);
     const pageNumber = event.first / event.rows + 1;
     getApiData(pageNumber);
   };
 
+  const selectRows = (count: number) => {
+    if (count > 12) {
+      setPendingSelections(count - 12);
+    }
+    if (apiData?.data) {
+      const selected = apiData.data.slice(0, count);
+      setSelectedData((prev) => [...prev, ...selected]);
+
+      if (count > 12) {
+        setPendingSelections(count - 12);
+      } else {
+        setPendingSelections(0);
+      }
+
+      op.current?.hide();
+    }
+  };
   return (
     <div className="card">
       <DataTable
@@ -94,9 +126,9 @@ export const DTable = () => {
             <div
               style={{
                 display: "flex",
+                justifyContent: "space-around",
                 alignItems: "center",
-                justifyContent: "space-between",
-                gap: "1rem",
+                gap: "4rem",
               }}
             >
               <span>Title</span>
@@ -105,24 +137,19 @@ export const DTable = () => {
                   className="pi pi-chevron-down"
                   onClick={(e) => op.current?.toggle(e)}
                 ></i>
-              </span>
-              <span>
-                <OverlayPanel ref={op}>
-                  <SelectRows
-                    onSubmit={(count) => {
-                      if (apiData?.data) {
-                        const selected = apiData.data.slice(0, count);
-                        setSelectedData(selected);
-                        op.current?.hide();
-                      }
-                    }}
-                  />
-                </OverlayPanel>
+                <span>
+                  <OverlayPanel ref={op}>
+                    <SelectRows
+                      onSubmit={(count: number) => {
+                        selectRows(count);
+                      }}
+                    />
+                  </OverlayPanel>
+                </span>
               </span>
             </div>
           }
         />
-
         <Column field="place_of_origin" header="Place of origin"></Column>
         <Column field="artist_display" header="Artist display"></Column>
         <Column field="inscriptions" header="Inscriptions"></Column>
