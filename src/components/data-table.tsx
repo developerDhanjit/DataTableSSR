@@ -32,12 +32,10 @@ export const DTable = () => {
   };
 
   const [apiData, setApiData] = useState<ApiItem>();
-  const [selectedData, setSelectedData] = useState<Artwork>();
+  const [selectedData, setSelectedData] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [first, setFirst] = useState<number>(0);
   const op = useRef<OverlayPanel>(null);
-
-  const [showOverlay, setShowOverlay] = useState<boolean>(false);
 
   const getApiData = async (pageNumber: number = 1) => {
     setLoading(true);
@@ -80,6 +78,8 @@ export const DTable = () => {
         totalRecords={apiData?.pagination?.total}
         tableStyle={{ minWidth: "20rem" }}
         selection={selectedData}
+        cellSelection
+        selectionMode="multiple"
         dataKey="id"
         onSelectionChange={(e) => setSelectedData(e.value)}
       >
@@ -108,7 +108,15 @@ export const DTable = () => {
               </span>
               <span>
                 <OverlayPanel ref={op}>
-                  <SelectRows />
+                  <SelectRows
+                    onSubmit={(count) => {
+                      if (apiData?.data) {
+                        const selected = apiData.data.slice(0, count);
+                        setSelectedData(selected);
+                        op.current?.hide();
+                      }
+                    }}
+                  />
                 </OverlayPanel>
               </span>
             </div>

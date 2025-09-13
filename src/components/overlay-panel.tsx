@@ -1,7 +1,12 @@
 import { Button } from "primereact/button";
 import { InputNumber } from "primereact/inputnumber";
 import { useState } from "react";
-export default function SelectRows() {
+
+type SelectRowsProps = {
+  onSubmit: (count: number) => void;
+};
+
+export default function SelectRows({ onSubmit }: SelectRowsProps) {
   const [value, setValue] = useState<number>(0);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -12,7 +17,14 @@ export default function SelectRows() {
         }}
         placeholder="select rows"
       />
-      <Button label="submit"/>
+      <Button
+        label="submit"
+        onClick={(e) => {
+          if (value > 0) {
+            onSubmit(value);
+          }
+        }}
+      />
     </div>
   );
 }
