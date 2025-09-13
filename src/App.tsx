@@ -1,10 +1,12 @@
 import { DTable } from "./components/data-table";
+import Footer from "./components/footer";
 function App() {
   return (
     <>
-      <h1>SSR Data Table</h1>
-      {/* <p>{JSON.stringify(apiData)} </p> */}
+      <h1>Datatable - SSR + PrimeReact </h1>
+      <h3>Assinment for : GrowMeOrganic </h3>
       <DTable />
+      <Footer />
     </>
   );
 }
